@@ -32,10 +32,10 @@
 
 | Opis                              | Vrijednost                          | IP ADRESA |
 |-----------------------------------|-------------------------------------|-----------|
-| Kubernetes API (Cluster 1)        | api.op1os.lan.croz.net              |           |
-| Interni Kubernetes API (Cluster 1)| api-int.op1os.lan.croz.net          |           |
-| Routes (Cluster 1)                | *.apps.op1os.lan.croz.net           |           |
-| Kubernetes API (Cluster 2)        | api.op2os.lan.croz.net              |           |
-| Interni Kubernetes API (Cluster 2)| api-int.op2os.lan.croz.net          |           |
-| Routes (Cluster 2)                | *.apps.op2os.lan.croz.net           |           |
+| Kubernetes API (Cluster 1)        | api.op1os.lan.croz.net              |10.0.16.27 |
+| Interni Kubernetes API (Cluster 1)| api-int.op1os.lan.croz.net          |10.0.16.27 |
+| Routes (Cluster 1)                | *.apps.op1os.lan.croz.net           |10.0.16.28 |
+| Kubernetes API (Cluster 2)        | api.op2os.lan.croz.net              |10.0.16.29 |
+| Interni Kubernetes API (Cluster 2)| api-int.op2os.lan.croz.net          |10.0.16.29 |
+| Routes (Cluster 2)                | *.apps.op2os.lan.croz.net           |10.0.16.30 |
 
