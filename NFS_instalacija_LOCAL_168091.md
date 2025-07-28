@@ -50,7 +50,7 @@ Testiranje pristupa sa klijenta:
 sudo mount -t nfs <server_ip>:/srv/nfs/shared /mnt
 ```
 
-## Spajanje na server iz klastera preko NFS provisionera
+## Spajanje na server iz klasteraj preko NFS provisionera
 
 
 Napraviti novi projekt samo za nfs i prebaciti se na njega
