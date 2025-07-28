@@ -9,7 +9,7 @@ sudo dnf install nfs-utils
 sudo systemctl enable --now nfs-server
 sudo systemctl status nfs-server
 ```
-Izrada i i postavljanje prava pristupa za direktorij koji se poslužuje
+Izrada i postavljanje prava pristupa za direktorij koji se poslužuje
 ```
 sudo mkdir -p /srv/nfs/shared
 sudo chown -R nobody:nobody /srv/nfs/shared
@@ -53,7 +53,7 @@ sudo mount -t nfs <server_ip>:/srv/nfs/shared /mnt
 ## Spajanje na server iz klastera preko NFS provisionera
 
 
-Napraviti novi projekt samo za nfs i prebaciti se na njega
+Napraviti novi projekt samo za NFS i prebaciti se na njega
 
 ```
 oc new-project nfs-provisoner
