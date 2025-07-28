@@ -277,8 +277,8 @@ Naredba:
     ./openshift-baremetal-install --dir install-dir agent create image
 
 generira ove datoteke:
-- agent.x86_64.iso
-- auth direktorij sa pristupnim podacima
+- **agent.x86_64.iso**
+- **auth** direktorij sa pristupnim podacima
 
 ### Podizanje čvorova
 
@@ -303,5 +303,5 @@ Provjera klastera:
 Pristup OpenShift Web Console:
 
 - URL: https://console-openshift-console.apps.my-cluster.example.com
-- Korisničko ime: kubeadmin
-- Lozinka: sadržaj fajla install-dir/auth/kubeadmin-password
+- Korisničko ime: **kubeadmin**
+- Lozinka: sadržaj datoteke **install-dir/auth/kubeadmin-password**
