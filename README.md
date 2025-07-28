@@ -1,4 +1,4 @@
-# OpenShift Bare-Metal Cluster Instalacija
+# OpenShift Cluster Instalacija
 
 ## DNS konfiguracija
 
@@ -44,8 +44,7 @@
 | Routes (Cluster 2)                | *.apps.op2os.lan.croz.net           |10.0.16.30 |
 
 
-## Agent-based instalacija za Cluster 2
-### Preuzimanje alata
+## Preuzimanje alata
 
 Preuzeti su sljedeći alati sa [OpenShift downloads](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/:)
 
@@ -57,12 +56,14 @@ Preuzeti su sljedeći alati sa [OpenShift downloads](https://mirror.openshift.co
 
 Instalacija je pokrenuta lokalno sa pripremljenog direktorija (agent-installer).
 
-### Generiranje SSH ključa
+## Generiranje SSH ključa
 
 Potrebno je generirati SSH ključ za pristup klasteru    :
 
     ssh-keygen -t ed25519 -N '' -f <path>/<file_name>
 
+
+## Agent-based bare-metal instalacija za Cluster 2
 ### install-config.yaml
 
 Ova datoteka definira osnovne parametre za instalaciju OpenShift klastera
