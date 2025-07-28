@@ -75,6 +75,7 @@ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs
     --set nfs.server=x.x.x.x \
     --set nfs.path=/exported/path
 ```
+Ovime se se stvara dinamički storage provisioner i StorageClass koji koristi taj provisioner.
 
 Ovako postavljan provisioner radi samo u odabranom namespaceu.
 
