@@ -28,7 +28,7 @@ onda OpenShift installer ipak zna o kojem cloudu je riječ i tu mu možemo provi
 
     cloudClusterManager: external
 
-Ukratko: za platform: <ime_cloud_providera> cloud radi sve umjesto nas (IPI), za external: {} mi radimo sve umjesto clouda te cloud služi samo kao zamjena za naše fizičke mašine (UPI), a također u external: možemo dodati i u kojem cloudu stvaramo cluster te aspekte koje može automatski predati na odgovornost clouda.
+Ukratko: za platform: <ime_cloud_providera> cloud radi sve umjesto nas (IPI), za external: {} mi radimo sve umjesto clouda te cloud služi samo kao zamjena za naše fizičke mašine (UPI), a također u external: možemo dodati i u kojem cloudu stvaramo cluster te aspekte koje može automatski predati na odgovornost clouda. Također jedna korist od platforme external je da možemo koristiti manje poznati cloud koji nije automatski podržavan u OpenShiftu.
 
 ## Reference: 
 https://issues.redhat.com/browse/OCPSTRAT-516
