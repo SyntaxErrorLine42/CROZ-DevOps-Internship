@@ -429,7 +429,9 @@ Klaster s jednim masterom i dva workera se ne može podići na baremetal platfor
     sshKey: ...
 
 ---
+
 Ostatak instalacije prati instalaciju klastera na baremetal platformi.
+
 ---
 ### HaProxy
 
