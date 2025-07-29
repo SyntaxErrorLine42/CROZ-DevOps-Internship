@@ -24,11 +24,19 @@ Ali ako koristimo nešto kao:
             x2: y2
             ...
 
-onda OpenShift installer ipak zna o kojem cloudu je riječ i tu mu možemo provideati neke aspekte clustera koje ne želimo konfigurirati sami (to je specifično za svaki cloud).
+onda OpenShift installer ipak zna o kojem cloudu je riječ i tu mu možemo provideati neke aspekte clustera koje ne želimo konfigurirati sami (to je specifično za svaki cloud). Primjer toga je ccm kojeg možemo postaviti na external, time signaliziramo installeru da je ipak u pitanju vanjski kontroler clustera. 
+
+    cloudClusterManager: external
 
 Ukratko: za platform: <ime_cloud_providera> cloud radi sve umjesto nas (IPI), za external: {} mi radimo sve umjesto clouda te cloud služi samo kao zamjena za naše fizičke mašine (UPI), a također u external: možemo dodati i u kojem cloudu stvaramo cluster te aspekte koje može automatski predati na odgovornost clouda.
 
 ## Reference: 
+https://issues.redhat.com/browse/OCPSTRAT-516
+
+https://github.com/openshift/enhancements/blob/master/enhancements/cloud-integration/infrastructure-external-platform-type.md
+
 https://docs.redhat.com/en/documentation/openshift_container_platform/4.18/html/installing_on_gcp/installing-gcp-user-infra
+
+https://docs.providers.openshift.org/platform-external/
 
 https://docs.okd.io/4.18/installing/installing_oci/installing-oci-agent-based-installer.html
