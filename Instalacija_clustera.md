@@ -36,9 +36,9 @@
 
 | Opis                              | Vrijednost                          | IP ADRESA |
 |-----------------------------------|-------------------------------------|-----------|
-| Kubernetes API (Cluster 1)        | api.op1os.lan.croz.net              |10.0.16.27 |
-| Interni Kubernetes API (Cluster 1)| api-int.op1os.lan.croz.net          |10.0.16.27 |
-| Routes (Cluster 1)                | *.apps.op1os.lan.croz.net           |10.0.16.28 |
+| Kubernetes API (Cluster 1)        | api.op1os.lan.croz.net              |10.0.16.26 |
+| Interni Kubernetes API (Cluster 1)| api-int.op1os.lan.croz.net          |10.0.16.26 |
+| Routes (Cluster 1)                | *.apps.op1os.lan.croz.net           |10.0.16.26 |
 | Kubernetes API (Cluster 2)        | api.op2os.lan.croz.net              |10.0.16.29 |
 | Interni Kubernetes API (Cluster 2)| api-int.op2os.lan.croz.net          |10.0.16.29 |
 | Routes (Cluster 2)                | *.apps.op2os.lan.croz.net           |10.0.16.30 |
@@ -48,11 +48,11 @@
 
 Preuzeti su sljedeći alati sa [OpenShift downloads](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/:)
 
-    openshift-install
+    $ openshift-install
 
-    openshift-baremetal-install
+    $ openshift-baremetal-install
 
-    oc CLI alat
+    $ oc CLI alat
 
 Instalacija je pokrenuta lokalno sa pripremljenog direktorija (agent-installer).
 
@@ -60,7 +60,7 @@ Instalacija je pokrenuta lokalno sa pripremljenog direktorija (agent-installer).
 
 Potrebno je generirati SSH ključ za pristup klasteru    :
 
-    ssh-keygen -t ed25519 -N '' -f <path>/<file_name>
+    $ ssh-keygen -t ed25519 -N '' -f <path>/<file_name>
 
 
 ## Agent-based bare-metal instalacija za Cluster 2
@@ -296,12 +296,162 @@ Postavljanje **kubeconfig**:
 
 Provjera klastera:
 
-    oc get nodes
-    oc get co
-    oc get pods -A
+    $ oc get nodes
+    $ oc get co
+    $ oc get pods -A
 
 Pristup OpenShift Web Console:
 
 - URL: https://console-openshift-console.apps.my-cluster.example.com
 - Korisničko ime: **kubeadmin**
 - Lozinka: sadržaj datoteke **install-dir/auth/kubeadmin-password**
+
+### Instalacija na platformi none
+
+Klaster s jednim masterom i dva workera se ne može podići na baremetal platformi zbog ograničenja openshift-install komande, stoga je platforma promjenjena na none. Razlika platformi none i baremetal je u tome da baremetal s explicitno zadanim IP adresama stvara API i Ingress VIPs na koje se prima promet. U platform none se ne stvaraju virtualne IP adrese vec se čitav promet mapira na rendezvous IP, stoga je potreban LoadBalancer poput HaProxy-a.
+
+## /etc/haproxy/haproxy.cfg
+
+    global
+      log         127.0.0.1 local2
+    global
+      log         127.0.0.1 local2
+      pidfile     /var/run/haproxy.pid
+      maxconn     4000
+      daemon
+    defaults
+      mode                    http
+      log                     global
+      option                  dontlognull
+      option http-server-close
+      option                  redispatch
+      retries                 3
+      timeout http-request    10s
+      timeout queue           1m
+      timeout connect         10s
+      timeout client          1m
+      timeout server          1m
+      timeout http-keep-alive 10s
+      timeout check           10s
+      maxconn                 3000
+
+    listen api-server-6443
+      bind 10.0.16.26:6443
+      mode tcp
+      option  httpchk GET /readyz HTTP/1.0
+      option  log-health-checks
+      balance roundrobin
+      server master0 master0.op1os.lan.croz.net:6443 weight 1 verify none check check-ssl inter 10s fall 2 rise 3
+
+    listen machine-config-server-22623
+      bind 10.0.16.26:22623
+      mode tcp
+      server master0 master0.op1os.lan.croz.net:22623 check inter 1s
+
+    listen ingress-router-443
+      bind 10.0.16.26:443
+      mode tcp
+      balance source
+      server worker0 worker0.op1os.lan.croz.net:443 check inter 1s
+      server worker1 worker1.op1os.lan.croz.net:443 check inter 1s
+
+    listen ingress-router-80
+      bind 10.0.16.26:80
+      mode tcp
+      balance source
+      server worker0 worker0.op1os.lan.croz.net:80 check inter 1s
+      server worker1 worker1.op1os.lan.croz.net:80 check inter 1s
+
+## agent-config.yaml
+    apiVersion: v1alpha1
+    kind: AgentConfig
+    metadata:
+    name: op1os
+    rendezvousIP: 10.0.16.18
+    hosts:
+    - hostname: master0
+        role: master
+        interfaces:
+        - name: enp0s13f0u2
+            macAddress: 60:7d:09:37:5f:bb
+        networkConfig:
+        interfaces:
+            - name: enp0s13f0u2
+            type: ethernet
+            state: up
+            mac-address: 60:7d:09:37:5f:bb
+            ipv4:
+                enabled: true
+                address:
+                - ip: 10.0.16.18
+                    prefix-length: 23
+                dhcp: false
+        dns-resolver:
+            config:
+            server:
+                - 10.0.10.2
+                - 10.0.10.3
+        routes:
+            config:
+            - destination: 0.0.0.0/0
+                next-hop-address: 10.0.16.1
+                next-hop-interface: enp0s13f0u2
+                table-id: 254
+
+## install-config.yaml
+
+    apiVersion: v1
+    baseDomain: lan.croz.net
+    compute:
+    - architecture: amd64
+        hyperthreading: Enabled
+        name: worker
+        replicas: 0
+    controlPlane:
+    architecture: amd64
+    hyperthreading: Enabled
+    name: master
+    replicas: 1
+    metadata:
+    name: op1os
+    networking:
+    clusterNetwork:
+        - cidr: 10.128.0.0/14
+        hostPrefix: 23
+    machineNetwork:
+        - cidr: 10.0.16.0/23
+    networkType: OVNKubernetes
+    serviceNetwork:
+        - 172.30.0.0/16
+    platform:
+        none:
+    pullSecret: ...
+    sshKey: ...
+
+---
+Ostatak instalacije prati instalaciju klastera na baremetal platformi.
+---
+### HaProxy
+
+Nakon što smo namjestili /etc/haproxy/haproxy.cfg, pozvali smo komandu: 
+
+    $ sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+
+Dobivamo potvrdu:
+
+    Configuration file is valid
+
+te pozivamo:
+
+    $ sudo haproxy -f /etc/haproxy/haproxy.cfg
+
+Stanje s portovima vidimo s 
+
+    $ sudo ss -ltnp | grep haproxy
+
+i dobivamo ispis 
+
+    LISTEN 0      3000      10.0.16.26:80         0.0.0.0:*    users:(("haproxy",pid=32800,fd=7))                        
+    LISTEN 0      3000      10.0.16.26:443        0.0.0.0:*    users:(("haproxy",pid=32800,fd=6))                        
+    LISTEN 0      3000      10.0.16.26:22623      0.0.0.0:*    users:(("haproxy",pid=32800,fd=5))                        
+    LISTEN 0      3000      10.0.16.26:6443       0.0.0.0:*    users:(("haproxy",pid=32800,fd=4))
