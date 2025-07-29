@@ -308,7 +308,7 @@ Pristup OpenShift Web Console:
 
 ### Instalacija na platformi none
 
-Klaster s jednim masterom i dva workera se ne može podići na baremetal platformi zbog ograničenja openshift-install komande, stoga je platforma promjenjena na none. Razlika platformi none i baremetal je u tome da baremetal s explicitno zadanim IP adresama stvara API i Ingress VIPs na koje se prima promet. U platform none se ne stvaraju virtualne IP adrese vec se čitav promet mapira na rendezvous IP, stoga je potreban LoadBalancer poput HaProxy-a.
+Klaster s jednim masterom i dva workera se ne može podići na baremetal platformi zbog ograničenja openshift-install komande, stoga je platforma promjenjena na none. Razlika platformi none i baremetal je u tome da baremetal s explicitno zadanim IP adresama stvara API i Ingress VIPs na koje se prima promet. U platform none se ne stvaraju virtualne IP adrese već se čitav promet mapira na rendezvous IP, stoga je potreban LoadBalancer poput HaProxy-a.
 
 ## /etc/haproxy/haproxy.cfg
 
@@ -455,3 +455,14 @@ i dobivamo ispis
     LISTEN 0      3000      10.0.16.26:443        0.0.0.0:*    users:(("haproxy",pid=32800,fd=6))                        
     LISTEN 0      3000      10.0.16.26:22623      0.0.0.0:*    users:(("haproxy",pid=32800,fd=5))                        
     LISTEN 0      3000      10.0.16.26:6443       0.0.0.0:*    users:(("haproxy",pid=32800,fd=4))
+
+Na kraju je potrebno staviti navedene portove u green listu u firewallu:
+
+    $ sudo firewall-cmd --permanent --add-port=80/tcp
+    $ sudo firewall-cmd --permanent --add-port=443/tcp
+    $ sudo firewall-cmd --permanent --add-port=22623/tcp
+
+te ga restartati:
+
+    $ sudo firewall-cmd --reload
+
