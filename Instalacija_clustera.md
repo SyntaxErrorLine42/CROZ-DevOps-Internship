@@ -460,6 +460,7 @@ Na kraju je potrebno staviti navedene portove u green listu u firewallu:
 
     $ sudo firewall-cmd --permanent --add-port=80/tcp
     $ sudo firewall-cmd --permanent --add-port=443/tcp
+    $ sudo firewall-cmd --permanent --add-port=6443/tcp
     $ sudo firewall-cmd --permanent --add-port=22623/tcp
 
 te ga restartati:
