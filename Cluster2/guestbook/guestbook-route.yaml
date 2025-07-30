@@ -10,4 +10,4 @@ spec:
     kind: Service
     name: guestbook
   port:
-    targetPort: http
+    targetPort: 3000
