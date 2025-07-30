@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: guestbook
-        image: gcr.io/google-samples/gb-frontend:v4
+        image: docker.io/ibmcom/guestbook:v1
         resources:
           requests:
             cpu: 100m
