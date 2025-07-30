@@ -469,3 +469,23 @@ te ga restartati:
 
     $ sudo firewall-cmd --reload
 
+## Namještanje rutera
+
+Problem je sada što smo započeli sa Single-Node clusterom pa se ruter vrtio samo na master nodeu, stoga ingress ne radi pravilno.
+
+Trebamo zabraniti scheduling deploymenta na masteru:
+
+    oc adm taint nodes master0.op1os.lan.croz.net node-role.kubernetes.io/master=:NoSchedule
+
+i onda možemo dodati patch u ingress operator gdje stavljamo dvije replike i forceamo ih da budu na workerima:
+
+    oc patch ingresscontroller default -n openshift-ingress-operator --type=merge -p '
+    spec:
+    replicas: 2
+    nodePlacement:
+        nodeSelector:
+        matchLabels:
+            node-role.kubernetes.io/worker: ""
+        tolerations: []
+    '
+
