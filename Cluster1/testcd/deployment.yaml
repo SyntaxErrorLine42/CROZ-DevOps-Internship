@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/version: 2.4.65
     helm.sh/chart: apache-11.4.1
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/instance: apache
