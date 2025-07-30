@@ -9,7 +9,8 @@ metadata:
 spec:
   ports:
   - port: 6379
-    targetPort: 6379
+    targetPort: redis
+    name: redis
   selector:
     app: redis
     role: master

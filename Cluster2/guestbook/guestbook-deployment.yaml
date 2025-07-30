@@ -27,3 +27,11 @@ spec:
           value: redis-master
         ports:
         - containerPort: 80
+          name: http
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault        

@@ -11,5 +11,3 @@ spec:
     name: guestbook
   port:
     targetPort: http
-  tls:
-    termination: edge

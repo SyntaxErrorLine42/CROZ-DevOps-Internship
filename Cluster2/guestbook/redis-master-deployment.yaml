@@ -27,3 +27,11 @@ spec:
             memory: 100Mi
         ports:
         - containerPort: 6379
+          name: redis
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
