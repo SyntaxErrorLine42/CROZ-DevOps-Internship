@@ -480,12 +480,18 @@ Trebamo zabraniti scheduling deploymenta na masteru:
 i onda možemo dodati patch u ingress operator gdje stavljamo dvije replike i forceamo ih da budu na workerima:
 
     oc patch ingresscontroller default -n openshift-ingress-operator --type=merge -p '
-    spec:
-    replicas: 2
-    nodePlacement:
-        nodeSelector:
-        matchLabels:
-            node-role.kubernetes.io/worker: ""
-        tolerations: []
-    '
+    {
+    "spec": {
+        "replicas": 2,
+        "nodePlacement": {
+        "nodeSelector": {
+            "matchLabels": {
+            "node-role.kubernetes.io/worker": ""
+            }
+        },
+        "tolerations": []
+        }
+    }
+    }'
+
 
