@@ -15,6 +15,10 @@ Dobijemo rute:
 
     argocd-sample-server-openshift-operators.apps.op2os.lan.croz.net
 
+i lozinku dobijemo s 
+
+    oc get secret argocd-sample-cluster -n <namespace_od_operatora> -o jsonpath='{.data.admin\.password}' | base64 -d
+
 s kojim pristupamo na ArgoCD sučelje.
 
 Spajamo naš git repo na kojem se nalaze deployment.yaml i service.yaml preko Settings -> Repositories -> Add repo te ispunimo sve potrebne informacije (link, credentials, Auto-Sync).
