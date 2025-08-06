@@ -201,6 +201,8 @@ Sada radimo dva senzora, prvi će respondati na event low, drugi na high
                               --type=merge
                               -p={"spec":{"template":{"spec":{"nodeSelector":{"kubernetes.io/hostname":"worker1.op1os.lan.croz.net"}}}}}
 
+Jako je bitno odabrati sliku bitnami/kubectl jer ona ima kubectl komandu.
+
 Također moramo dopustiti novom podu da čita i writea na deploymente:
 
     apiVersion: rbac.authorization.k8s.io/v1
