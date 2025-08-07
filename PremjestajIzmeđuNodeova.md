@@ -243,12 +243,12 @@ Veliki dio zadatka se ponvalja u ArgoWorkflow.md-u, ovdje je samo bila bitna ide
     
 P.S. ako je aktivan Argo CD za našu aplikaciju, u yaml od Argo CD-a je potrebno dodati:
 
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      name: js-prom-deploy
-      namespace: js-prom
-      jsonPointers:
-        - /spec/template/spec/nodeSelector/kubernetes.io~1hostname
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        name: js-prom-deploy
+        namespace: js-prom
+        jsonPointers:
+          - /spec/template/spec/nodeSelector/kubernetes.io~1hostname
 
 zbog toga što mi mijenjamo deployment svaki put kada premještamo pod, što će Argo detektirati kao promjenu te će automatski deployati podove iz definicija deploymenta i servicea na spojenom git repou, stoga mu moramo dati navedeno pravilo da ignorira node selector.
