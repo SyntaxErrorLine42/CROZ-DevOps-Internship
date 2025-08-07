@@ -239,5 +239,5 @@ Također moramo dopustiti novom podu da čita i writea na deploymente:
         name: default
         namespace: argo-events
 
-To je to:)
+Veliki dio zadatka se ponvalja u ArgoWorkflow.md-u, ovdje je samo bila bitna ideja izvedbe kubectl patch komande za preseljenje poda sa jednog nodea na drugi. To je to:)
     
