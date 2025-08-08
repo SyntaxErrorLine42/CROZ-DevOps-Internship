@@ -132,3 +132,30 @@ i možemo vidjeti:
     mysql
     mongodb
 
+To je samo primjer, a sada ćemo stvoriti 2 poola za naše clustere:
+
+```
+$ sudo ceph osd pool create cluster1
+$ sudo ceph osd pool application enable cluster1 rbd
+
+$ sudo ceph osd pool create cluster2
+$ sudo ceph osd pool application enable cluster2 rbd
+```
+## ODF
+Sada ćemo skinuti ODF operator s operatorHub-a te ćemo u menu dobiti novu opciju Storage->Data Foundation->StorageSystem->Create StorageSystem.
+
+Odaberemo 'Full development' i opciju 'External'.
+
+Zatim ćemo dobiti python skriptu koju ćemo morati pokrenuti na laptopu s Ceph clusterom. Skinemo je i prebacimo na Ceph laptop:
+
+    $ scp ceph-external-cluster-details-exporter.py storage@10.0.16.26:~
+
+Zatim pozovemo:
+
+```
+$ python3 ceph-external-cluster-details-exporter.py --rbd-data-pool-name cluster1
+$ python3 ceph-external-cluster-details-exporter.py --rbd-data-pool-name cluster2
+```
+
+te dobivamo odgovarajući JSON metadata kojeg lijepimo u StorageSystem creator.
+
