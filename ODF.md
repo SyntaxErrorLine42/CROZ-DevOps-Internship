@@ -159,3 +159,13 @@ $ python3 ceph-external-cluster-details-exporter.py --rbd-data-pool-name cluster
 
 te dobivamo odgovarajući JSON metadata kojeg lijepimo u StorageSystem creator.
 
+Zatim odabiremo 'CREATE' te pustimo da se instalira. Nakon instalacije valjanost storagea možemo vidjeti s komandom:
+
+    $ oc get storagecluster -n openshift-storage
+
+te vidimo:
+
+```
+NAME                          AGE     PHASE   EXTERNAL   CREATED AT             VERSION
+ocs-external-storagecluster   6m38s   Ready   true       2025-08-08T10:13:15Z   4.19.0
+```
