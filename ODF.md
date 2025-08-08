@@ -3,6 +3,8 @@
 Potrebno je iskoristiti deveti laptop za ceph storage cluster koji će služiti kao Persistent Volume za prvi i drugi cluster koji će se preko ODF operatora spajati na Ceph.
 
 ---
+## Instalacija Ceph clustera
+
 Za instalaciju single node Ceph clustera koristimo dnf paket cephadm jer je moderniji i bolje prilagođen za single node clustere. Pratimo korake s https://www.redhat.com/en/blog/ceph-cluster-single-machine. 
 
 Prvo dodajemo najnoviji paket za skidanje cephadm:
@@ -63,3 +65,70 @@ $ ceph -s
 Vidimo da dobivamo HEALTH_WARN zbog nedostatka OSD-a. OSD je Object Storage Daemon i njegova je uloga spremanje i upravljanje našim podatcima.
 
 Da bi dodali OSD potreban nam je čisti SSD kojeg smo zatražili od internog IT-a.
+
+S komandom 'lsblk' dobijemo ime novog SSD-a i pozovemo komandu za stvaranje OSD-a:
+
+    $ sudo ceph orch daemon add osd storage.opos.lan.croz.net:/dev/nvme0n1
+
+
+Također, smanjli smo minimalnu velicinu osd_pool_default_size na 1 s komandom:
+
+    $ ceph config set global osd_pool_default_size 1
+
+Trenutno stanje je ovakvo:
+
+```
+ceph -s
+  cluster:
+    id:     d6e665a8-7392-11f0-9742-3c18a057a79b
+    health: HEALTH_WARN
+            1 stray host(s) with 1 daemon(s) not managed by cephadm
+            1 pool(s) have no replicas configured
+ 
+  services:
+    mon: 1 daemons, quorum storage (age 25m)
+    mgr: storage.rkbwdt(active, since 25m), standbys: storage.fdimse
+    osd: 1 osds: 1 up (since 8m), 1 in (since 8m)
+ 
+  data:
+    pools:   1 pools, 1 pgs
+    objects: 2 objects, 577 KiB
+    usage:   8.6 MiB used, 954 GiB / 954 GiB avail
+    pgs:     1 active+clean
+```
+
+HEALTH_WARN zanemajujemo zbog toga što imamo samo jedan disk pa neće biti duplikata.
+
+Sada kreiramo novi pool imena RBD s:
+
+    $ sudo ceph osd pool create rbd
+
+    $ sudo ceph osd pool application enable rbd rbd
+
+Sada možemo vidjeti sa 
+
+    $ ceph osd pool ls
+
+listu naših poolova:
+
+    .mgr
+    rbd
+
+.mgr je unutarnji pool koji se automatski kreira i njega ne koristimo, a rbd je naš pool u kojem možemo definirati naše "virtualne diskove" koje možemo dodjeljivati aplikacijama na korištenje.
+
+Npr. možemo stvoriti dva virtualna diska s komandama:
+
+```
+$ sudo rbd create mysql --size 1G
+
+$ sudo rbd create mongodb --size 2G
+```
+I onda izlistamo diskove unutar poola:
+
+    $ sudo rbd list
+
+i možemo vidjeti:
+
+    mysql
+    mongodb
+
