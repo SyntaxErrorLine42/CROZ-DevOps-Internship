@@ -169,3 +169,21 @@ te vidimo:
 NAME                          AGE     PHASE   EXTERNAL   CREATED AT             VERSION
 ocs-external-storagecluster   6m38s   Ready   true       2025-08-08T10:13:15Z   4.19.0
 ```
+
+
+## Dodatci:
+
+U slučaju reinstalacije CEPH OSD-a potrebno je formatirati kompletni disk:
+```
+$ cephadm ceph-volume lvm zap --destroy /dev/nvme0n1
+
+$ wipefs -af /dev/nvme0n1
+
+$ cephadm ceph-volume lvm zap --destroy /dev/nvme0n1
+
+$ partprobe /dev/nvme0n1
+
+$ reboot
+```
+
+Također, kod deinstalacije systemStoragea (kind se zapravo zove systemCluster) potrebno je otići u yaml i promijeniti mode deinstalacije iz ```graceful``` u ```forced``` i također treba izbrisati sve unutar ```finalizers:``` polja.
