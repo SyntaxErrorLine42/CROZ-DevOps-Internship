@@ -127,3 +127,15 @@ spec:
 ```
 
 I sada kada debugamo u pod nfs-test-restore vidimo da se naš test.txt file nalazi i u novom PV-u.
+
+Trenutno stanje na NFS serveru:
+```
+[root@api exports]# ls                                               
+op1os  op2os  pvc-1b78bdd5-df08-4e1b-9adf-09a5282aeaf2  pvc-7bee8dc7-507a-40f2-a6fa-eddfde52c88d  snapshot-418be3cb-8d8c-4ab7-9e6b-59c9df1e778b
+[root@api exports]# ls pvc-1b78bdd5-df08-4e1b-9adf-09a5282aeaf2/     
+test
+[root@api exports]# ls pvc-7bee8dc7-507a-40f2-a6fa-eddfde52c88d/     
+test
+[root@api exports]# ls snapshot-418be3cb-8d8c-4ab7-9e6b-59c9df1e778b/
+pvc-7bee8dc7-507a-40f2-a6fa-eddfde52c88d.tar.gz
+```
