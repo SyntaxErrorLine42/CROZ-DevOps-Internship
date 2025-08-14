@@ -1,5 +1,16 @@
 Zadatak: imamo dva clustera op1os i op2os. Op1os je hub cluster a op2os je managed cluster. Zadatak je složiti disaster recovery na aplikaciji u op2os tako da se aplikacija i njeni PVC-ovi prebace na op1os u slučaju crasha, dakle, nesmije biti data lossa.
 
+Prije početka potrebno je skinuti ACM operator na glavnom HUB-u, te dodati drugi cluster (op2os).
+
+![alt text](./images/acm.png)
+
+Zatim odlazimo na All Clusters->Import Cluster i dolazimo na sučelje u kojem zadajemo ime i ostale vrijednosti dodatnog clustera i u određeno polje mu dajemo njegov kubeconfig.
+
+![alt text](./images/acm2.png)
+
+Finalno stanje možemo vidjeti na ```All clusters```:
+![alt text](./images/acm3.png)
+
 Na op1os ĆE BITI skinut 'Openshift DR Hub Operator', a na op2os 'Openshift DR Cluster Operator'. Opis instalacije ODF operatora je prethodno objašnjen u ODF.md dokumentaciji. (NAPOMENA: MI NISMO SKIDALI TE OPERATORE, ONI ĆE SE SAMI SKINUTI TEK NAKON INSTALACIJE ODF MULTICLUSTER OPERATORA, OVO JE SAMO OSTAVLJENO KAO NAZNAKA DA ČITATELJ VIDI TKO JE GLAVNI CLUSTER A TKO NE, UKOLIKO SE OVI OPERATORI RUČNO SKINU NASTAT ĆE MNOGO PROBLEMA)
 
 Za test smo koristili jako jednostavnu bash skriptu koja ispisuje timestamp svakih 15 minuta u /timestamps/timestamp.log:

@@ -68,12 +68,9 @@ Da bi dodali OSD potreban nam je čisti SSD kojeg smo zatražili od internog IT-
 
 S komandom 'lsblk' dobijemo ime novog SSD-a i pozovemo komandu za stvaranje OSD-a:
 
-    $ sudo ceph orch daemon add osd storage.opos.lan.croz.net:/dev/nvme0n1
+    $ sudo ceph orch daemon add osd <ime_hosta>:/dev/<ime_diska>
 
 
-Također, smanjli smo minimalnu velicinu osd_pool_default_size na 1 s komandom:
-
-    $ ceph config set global osd_pool_default_size 1
 
 Trenutno stanje je ovakvo:
 
@@ -175,15 +172,22 @@ ocs-external-storagecluster   6m38s   Ready   true       2025-08-08T10:13:15Z   
 
 U slučaju reinstalacije CEPH OSD-a potrebno je formatirati kompletni disk:
 ```
-$ cephadm ceph-volume lvm zap --destroy /dev/nvme0n1
+$ cephadm ceph-volume lvm zap --destroy /dev/<ime_diska>
 
-$ wipefs -af /dev/nvme0n1
+$ wipefs -af /dev/<ime_diska>
 
-$ cephadm ceph-volume lvm zap --destroy /dev/nvme0n1
+$ cephadm ceph-volume lvm zap --destroy /dev/<ime_diska>
 
-$ partprobe /dev/nvme0n1
+$ partprobe /dev/<ime_diska>
 
 $ reboot
+```
+
+Zatim:
+
+```
+$ cephadm fsid  # ovo kopiramo i stavimo u sljedeću naredbu
+$ cephadm rm-cluster --force --zap-osds --fsid <fsid>
 ```
 
 Također, kod deinstalacije systemStoragea (kind se zapravo zove systemCluster) potrebno je otići u yaml i promijeniti mode deinstalacije iz ```graceful``` u ```forced``` i također treba izbrisati sve unutar ```finalizers:``` polja.
