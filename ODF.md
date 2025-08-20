@@ -138,6 +138,54 @@ $ sudo ceph osd pool application enable cluster1 rbd
 $ sudo ceph osd pool create cluster2
 $ sudo ceph osd pool application enable cluster2 rbd
 ```
+
+### Postavljanje RGW Servisa
+
+RGW Servis služi kao API za upravljanje S3 podacima na Cephu.
+
+Upute za [postavljanje sa service specifikacijom](https://docs.redhat.com/en/documentation/red_hat_ceph_storage/6/html/object_gateway_guide/deployment#deploying-the-ceph-object-gateway-using-the-service-specification_rgw), kreira se datoteka ***radosgw.yaml***:
+
+```
+service_type: rgw
+service_id: default
+placement:
+  hosts:
+  - storage
+  count_per_host: 1
+spec:
+  rgw_realm: test_realm
+  rgw_zone: test_zone
+  rgw_zonegroup: test_zonegroup
+  rgw_frontend_port: 3333
+networks:
+  -  10.0.16.0/23
+```
+
+Prije primjene provjeriti postoje li odgovarajući (*default*) realm, realm zone i realm zone group instance, pa ih kreirati ako ne postoje:
+
+```
+radosgw-admin realm create --rgw-realm=test_realm --default
+
+radosgw-admin zonegroup create --rgw-zonegroup=test_zonegroup --rgw-realm=test_realm --default --master
+
+radosgw-admin zone create --rgw-zonegroup=test_zonegroup --rgw-zone=test_zone --default
+
+radosgw-admin period update --rgw-realm=test_realm --commit
+```
+
+Konačno, *radosgw.yaml* se mounta u storage host i deploya:
+```
+sudo cephadm shell --mount radosgw.yml:/var/lib/ceph/radosgw/radosgw.yml
+[ceph: root@host01 /]# ceph orch apply -i /var/lib/ceph/radosgw/radosgw.yml
+```
+
+Kao provjera može se pozvati:
+```
+ceph orch ls
+ceph orch ps --daemon_type=rgw
+```
+
+
 ## ODF
 Sada ćemo skinuti ODF operator s operatorHub-a te ćemo u menu dobiti novu opciju Storage->Data Foundation->StorageSystem->Create StorageSystem.
 
@@ -186,7 +234,7 @@ $ reboot
 Zatim:
 
 ```
-$ cephadm fsid  # ovo kopiramo i stavimo u sljedeću naredbu
+$ ceph fsid  # ovo kopiramo i stavimo u sljedeću naredbu
 $ cephadm rm-cluster --force --zap-osds --fsid <fsid>
 ```
 
