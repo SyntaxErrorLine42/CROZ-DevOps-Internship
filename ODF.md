@@ -161,7 +161,7 @@ networks:
   -  10.0.16.0/23
 ```
 
-Prije primjene provjeriti postoje li odgovarajući (*default*) realm, realm zone i realm zone group instance, pa ih kreirati ako ne postoje:
+Prije primjene potrebno je napraviti odgovarajuće realm, realm zone i realm zone group instance. Bitno je da zonegroup bude master jer će se inače period buniti da nema master zonegroup:
 
 ```
 radosgw-admin realm create --rgw-realm=test_realm --default
@@ -184,6 +184,97 @@ Kao provjera može se pozvati:
 ceph orch ls
 ceph orch ps --daemon_type=rgw
 ```
+
+### Testiranje S3
+
+Potrebno je instalirati i podesiti AWS CLI:
+
+```
+sudo dnf install awscli -y
+aws --version
+```
+
+Zatim se konfigurira CLI sa pristupnim ključevima:
+
+```
+aws configure
+# AWS Access Key ID [None]: <your-access-key>
+# AWS Secret Access Key [None]: <your-secret-key>
+# Default region name [None]: us-east-1
+# Default output format [None]: json
+```
+Ovi se pristupni podaci dobiju iz Cepha, za pristup se koristi korisnik *dashboard* (može se koristiti bilo koji korisnik), a pristupni ključevi su u dijelu *keys*, region polje treba biti us-east-1:
+```
+[storage@storage ~]$ sudo radosgw-admin user info --uid=dashboard
+{
+    "user_id": "dashboard",
+    "display_name": "Ceph Dashboard",
+    "email": "",
+    "suspended": 0,
+    "max_buckets": 1000,
+    "subusers": [],
+    "keys": [
+        {
+            "user": "dashboard",
+            "access_key": "3TI3WLMUTPS0MGKRBYNE",
+            "secret_key": "dvOaw1fMe2rwHq5DHXvoc6vI9jicCi9AezQmGFwI",
+            "active": true,
+            "create_date": "2025-08-20T13:35:02.120554Z"
+        }
+    ],
+    "swift_keys": [],
+    "caps": [],
+    "op_mask": "read, write, delete",
+    "system": true,
+    "default_placement": "",
+    "default_storage_class": "",
+    "placement_tags": [],
+    "bucket_quota": {
+        "enabled": false,
+        "check_on_raw": false,
+        "max_size": -1,
+        "max_size_kb": 0,
+        "max_objects": -1
+    },
+    "user_quota": {
+        "enabled": false,
+        "check_on_raw": false,
+        "max_size": -1,
+        "max_size_kb": 0,
+        "max_objects": -1
+    },
+    "temp_url_keys": [],
+    "type": "rgw",
+    "mfa_ids": [],
+    "account_id": "",
+    "path": "/",
+    "create_date": "2025-08-20T13:35:02.120484Z",
+    "tags": [],
+    "group_ids": []
+}
+```
+
+Kada smo konfigurirali AWS pristup, možemo kreirati bucket za testiranje:
+
+```
+aws --endpoint-url http://storage.opos.lan.croz.net s3 mb s3://test-bucket
+aws --endpoint-url http://storage.opos.lan.croz.net s3 ls
+```
+
+I provjeriti radi li S3 ispravno:
+```
+$ echo "hello ceph" > test.txt
+$ aws --endpoint-url http://storage.opos.lan.croz.net s3 cp test.txt s3://test-bucket/
+2025-08-21 08:49:08 test-bucket
+$ aws --endpoint-url http://storage.opos.lan.croz.net s3 ls s3://test-bucket/
+2025-08-21 08:57:36         11 test.txt
+$ aws --endpoint-url http://storage.opos.lan.croz.net s3 cp s3://test-bucket/test.txt downloaded.txt
+download: s3://test-bucket/test.txt to ./downloaded.txt 
+$ cat downloaded.txt 
+hello ceph
+```
+
+*NAPOMENA: Domena storage.opos.lan.croz.net odnosi se na storage računalo na kojem se nalazi i haproxy za cluster 1, zbog kojeg je default http port 80 rezerviran. Da bi se to zaobišlo haproxy konfiguracija je promijenjena dodatkom ACL pravila koji zahtjeve sa storage.opos.lan.croz.net hostname prosljeđuje na RGW poslužitelj na portu 3333, a sve ostale zahtjeve prosljeđuje normalno prema cluster 1.
 
 
 ## ODF

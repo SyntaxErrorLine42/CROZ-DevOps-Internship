@@ -7,3 +7,6 @@
 5. [ArgoCD GitOps](./ArgoCD.md)
 6. [Argo Workflows spajanje sa ispisom](./ArgoWorkflows.md)
 7. [Argo Workflows sa premještanjem između nodeova](./PremjestajIzmeđuNodeova.md)
+8. [NFS-CSI](./NFS-CSI.md)
+9. [ODF](./ODF.md)
+10. [ACM Disaster Recovery](./ACM_DisasterRecovery.md)
