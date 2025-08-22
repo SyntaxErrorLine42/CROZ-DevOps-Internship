@@ -179,6 +179,34 @@ sudo cephadm shell --mount radosgw.yml:/var/lib/ceph/radosgw/radosgw.yml
 [ceph: root@host01 /]# ceph orch apply -i /var/lib/ceph/radosgw/radosgw.yml
 ```
 
+Ceph JAKO ne voli biti na single node clusteru, i defualt postavke su za minimalno 2 node-a (size 2). Te defualt postavke zajedno sa veličinom PGova po poolu je potrebno smanjiti na minimum jer će se Ceph inače preplaviti PGovima kod spajanja na ODF:
+```
+#!/bin/bash
+
+# Omogući postavljanje pool size na 1
+sudo ceph config set mon mon_allow_pool_size_one true
+sudo ceph config get mon mon_allow_pool_size_one
+
+# Dobavi listu svih poolova
+pools=$(sudo ceph osd pool ls)
+
+for pool in $pools; do
+    echo "Processing pool: $pool"
+
+    # Isključi autoscaler odmah na početku
+    sudo ceph osd pool set "$pool" pg_autoscale_mode off
+
+    # Postavljanje replica size i min_size na 1
+    sudo ceph osd pool set "$pool" size 1 --yes-i-really-mean-it
+    sudo ceph osd pool set "$pool" min_size 1
+
+    # Postavljanje pg_num i pgp_num na 8
+    sudo ceph osd pool set "$pool" pg_num 8
+    sudo ceph osd pool set "$pool" pgp_num 8
+done
+```
+Nakon ove skripte se Ceph više neće žaliti na *degraded data redundancy*, već će se samo žaliti na *no replication configured*, te se neće događati kvar zbog previše PGova po OSDu jer se broj PGova na svakom poolu smanjuje sa 32 na 8 (maksimum po OSDu je 250). Jako je bitno i da je *pg_autoscale_mode* ***off*** jer će se PGovi inače automatski skalirati i doći će do PG overheada.
+
 Kao provjera može se pozvati:
 ```
 ceph orch ls
@@ -203,7 +231,7 @@ aws configure
 # Default region name [None]: us-east-1
 # Default output format [None]: json
 ```
-Ovi se pristupni podaci dobiju iz Cepha, za pristup se koristi korisnik *dashboard* (može se koristiti bilo koji korisnik), a pristupni ključevi su u dijelu *keys*, region polje treba biti us-east-1:
+Ovi se pristupni podaci dobiju iz *radosgw-admin user info* naredbe, za pristup se koristi korisnik *dashboard* (može se koristiti bilo koji korisnik), a pristupni ključevi su u dijelu *keys*, region polje treba biti us-east-1 će RGW inače odbiti pristup:
 ```
 [storage@storage ~]$ sudo radosgw-admin user info --uid=dashboard
 {
@@ -286,11 +314,18 @@ Zatim ćemo dobiti python skriptu koju ćemo morati pokrenuti na laptopu s Ceph 
 
     $ scp ceph-external-cluster-details-exporter.py storage@10.0.16.26:~
 
-Zatim pozovemo:
+Na Cephu kreiramo nove usere, po jedan za svaki cluster, sa svim dozvolama:
 
 ```
-$ python3 ceph-external-cluster-details-exporter.py --rbd-data-pool-name cluster1
-$ python3 ceph-external-cluster-details-exporter.py --rbd-data-pool-name cluster2
+ceph auth add client.odf.cluster1user mon 'allow *' osd 'allow *' mgr 'allow *'
+ceph auth add client.odf.cluster2user mon 'allow *' osd 'allow *' mgr 'allow *'
+```
+
+Zatim pozovemo python skriptu koja za parametre treba ime RBD data poola, RGW endpoint i usera:
+
+```
+python3 ceph-external-cluster-details-exporter.py --rbd-data-pool-name cluster2 --rgw-endpoint 10.0.16.26:3333 --run-as-user client.odf.cluster2user
+python3 ceph-external-cluster-details-exporter.py --rbd-data-pool-name cluster1 --rgw-endpoint 10.0.16.26:3333 --run-as-user client.odf.cluster1user
 ```
 
 te dobivamo odgovarajući JSON metadata kojeg lijepimo u StorageSystem creator.
