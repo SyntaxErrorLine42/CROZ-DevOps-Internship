@@ -18,6 +18,10 @@ $ oc new-project kasten-io \
 
 zatim pratimo gore navedenu dokumentaciju.
 
+---
+
+### Instalacija
+
 Skidamo Kasten operator:
 
 ![alt text](images/veeam1.png)

@@ -10,3 +10,5 @@
 8. [NFS-CSI](./NFS-CSI.md)
 9. [ODF](./ODF.md)
 10. [ACM Disaster Recovery](./ACM_DisasterRecovery.md)
+11. [Veeam Kasten](./Veeam.md)
+12. [KEDA](./KEDA.md)
