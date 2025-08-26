@@ -1,4 +1,4 @@
-KEDA je platforma koja služi za autoscalanje. Zadatak je da napravimo scalanje na osnovu na 3 stvari: cron, http i metrics.
+KEDA je platforma koja služi za autoscalanje. Zadatak je da napravimo scalanje na osnovu na 3 stvari: cron, cpu i metrics.
 
 ### Početak
 
@@ -167,7 +167,7 @@ Idemo promijeniti end u 14h (sada je 16:44) i trebat ćemo vidjeti 0 podova:
 
 ![alt text](images/keda6.png)
 
-### Treći dio (HTTP)
+### Treći dio (Metrics)
 
 Ovaj dio je jako sličan već napravljenom zadatku gdje smo s Prometheusom scrapeali metrike i s obzirom na njih radimo pojedine patcheve na deployment.yaml. Koristimo već napravljen Service Monitor u prethodnoj Monitoring dokumentaciji i radimo yaml za Scaled Object:
 ```
