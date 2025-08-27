@@ -90,6 +90,8 @@ Zatim je potrebno dodati novi Backup destination - NFS server (*Cloud Settings -
 
 *NAPOMENA 2: Portworx Backup je zamišljen i najbolje radi kao nadogradnja za Portworx Enterprise. PX Enterprise tu služi kao cijeli storage orchestrator koji kontrolira fizički smještaj podataka po nodeovima, i zajedno sa PX Backup omogućava  automatizaciju, konzistentne snapshotove i disaster recovery. NFS rješenje je jako ograničeno i sporo.
 
+Cluster s 2 worker noda ne može postaviti PX Enterprise StorageCluster jer je minimum 3 workera. Zbog toga koristimo NFS za demonstraciju.
+
 
 ## Testiranje
 
