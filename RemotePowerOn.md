@@ -58,6 +58,29 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
 
 CMD [ "bash" ]
 ```
+Također trebamo napraviti Service Account sa cluster roleom jer samo tako može zapravo suspendati node:
+```
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: node-admin
+  namespace: keda-test
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: node-admin-binding
+subjects:
+- kind: ServiceAccount
+  name: node-admin
+  namespace: keda-test
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+
+
+```
 
 Sada možemo narpaviti probni pod za testiranje komandi. Ideja je imati dva Joba, jedan će izvršavati `kubectl drain` i `oc debug` u node i onda `suspend`. Drugi će raditi `wakeonlan` i zatim `kubectl uncordon`. 
 Problem: za slanje wakeonlan paketa MORAMO biti u istoj mreži, a podovi su po defaultu u vlastitoj izloranoj mreži, stoga je potrebno postaviti `hostNetwork: true`. WOL paket je UDP paket na port 9 koji se broadcasta na sve mac adrese i u payloadu sadrži ciljanu MAC adresu.
