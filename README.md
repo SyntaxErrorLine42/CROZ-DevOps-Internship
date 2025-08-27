@@ -12,4 +12,5 @@
 10. [ACM Disaster Recovery](./ACM_DisasterRecovery.md)
 11. [Veeam Kasten](./Veeam.md)
 12. [KEDA](./KEDA.md)
-13. [Portworx Backup](./PortworxBackup.md)
+13. [Remote paljenje i gašenje nodea u Baremetal clusteru](./RemotePowerOn.md)
+14. [Portworx Backup](./PortworxBackup.md)
