@@ -165,6 +165,7 @@ spec:
       end: "1 17 * * *"
       timezone: "Europe/Zagreb"
       pollingInterval: "30"
+      desiredReplicas: "1"
 ```
 ```
 apiVersion: keda.sh/v1alpha1
@@ -202,6 +203,7 @@ spec:
       end: "1 9 * * *"
       timezone: "Europe/Zagreb"
       pollingInterval: "30"
+      desiredReplicas: "1"
 ```
 EXTRA: Također možemo i namjestiti trigger kao prometheus metrics slično što smo radili u KEDA dokumentaciji koristeći jednostavnu JavaScript aplikaciju koja exposa svoje metrike. U tom slučaju Jobovi će izgledati ovako:
 ```
