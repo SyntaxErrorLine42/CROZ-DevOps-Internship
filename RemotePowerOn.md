@@ -151,7 +151,7 @@ NOTE: koristio sam primjere gdje je node već cordoned i u prethodnom logs uncor
 
 Idemo sada dovršiti zadatak. Cilj nam je izvan radnog vremena ugasiti node, a za vrijeme radnog vremena upaliti. Već smo koristili `type: cron` u dokumentaciji KEDA.md tako da trebamo samo promijeniti trigger.
 
-Radimo dva ScalingJob-a (KEDA):
+Radimo dva ScalingJob-a (Ovdje koristimo KEDU, mogli smo i običan CronJob, ispada isto na kraju):
 ```
 apiVersion: keda.sh/v1alpha1
 kind: ScaledJob
