@@ -121,13 +121,9 @@ $ sudo coreos-installer install /dev/vda --ignition-url http://10.0.16.76:9956/w
 (disk identificiramo s `$ lsblk`)
 Sačekamo instalaciju te pratimo sve ostale korake kao i u prvoj metodi samo bez koraka u konzoli.
 
-### Napomena
-Za vrijeme instalacije nodea može se dogoditi da nedostaje jedan file te se zbog njega pokazuje da je node `Not Ready`. Naime, u logovima od nodea možemo vidjeti da traži CNI definiciju te da je ne može pronaći:
-```
-network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: no CNI configuration file in /etc/kubernetes/cni/net.d/. Has your network provider started?
-```
+### Treća metoda
 
-File u pitanju je /etc/kubernetes/cni/net.d/00-multus.conf. Workaround je da odemo u već postojeći node te kopiramo taj file i prenesemo ga na novi node u isti path pod istim imenom te restartamo kubelet s `$ systemctl restart kubelet` i onda će node biti `Ready`. 
+
 
 ## Konfiguracija remote paljenja i gašenja
 Dalje samo pratimo dokumentaciju [prijašnjeg zadatka](./RemotePowerOn.md) sa malim izmjenama.
