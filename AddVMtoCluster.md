@@ -1,5 +1,3 @@
-ukratko: skini coreos image, napravi volume, nfs za home dir, skini discovery image, namjesti oni bridging, napravi virtualku na novom nfsu sa tim imageom i barem 2cpu 8ram 120gb i sa tim interfaceom (obavezno ugasit pod networking) i stavit node selector koji smo prije annotirali, dodat host i onda approvat certifikate i onda 00-multus.conf.
-
 Zadatak: U RemotePowerOn.md je objašnjen zadatak gdje smo s obzirom na metrike ili vrijeme odlučivali hoće li node biti upaljen ili ugašen. Ovaj zadatak je sličan, samo što ne koristimo fizički node već stvaramo Virtual Machine kojeg ćemo dodati kao workera. Zanimljivi detalj je da ćemo instancu virtualke vrtiti na samom Openshiftu.
 
 ## Početak
