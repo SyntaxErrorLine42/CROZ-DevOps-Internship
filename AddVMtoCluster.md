@@ -104,7 +104,17 @@ with socketserver.TCPServer(("", PORT), IgnitionHandler) as httpd:
 
 
 ```
-Sada možemo instalirati običnu Core OS sliku s interneta te stvoriti volume sa njom. Kada se instalira pozovemo:
+Sada možemo instalirati Core OS sliku (https://docs.redhat.com/en/documentation/openshift_container_platform/4.19/html/nodes/worker-nodes-for-single-node-openshift-clusters#sno-adding-worker-nodes-to-single-node-clusters-manually_add-workers)
+```
+$ OCP_VERSION=latest-4.19
+
+$ ARCH=x86-64
+
+$ ISO_URL=$(./openshift-install coreos print-stream-json | grep location | grep $ARCH | grep iso | cut -d\" -f4)
+
+$ curl -L $ISO_URL -o rhcos-live.iso
+```
+te stvoriti volume sa njom. Kada se instalira pozovemo:
 ```
 $ sudo coreos-installer install /dev/vda --ignition-url http://10.0.16.76:9956/worker.ign --insecure-ignition
 ```
