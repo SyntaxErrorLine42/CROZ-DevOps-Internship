@@ -40,11 +40,11 @@ spec:
         "name": "br-ex-network",
         "type": "ovn-k8s-cni-overlay",
         "netAttachDefName": "openshift-storage/br-ex-network",
-        "topology": "localnet"
+        "topology": "localnet",
+        "mtu": 1500 # MORA BITI INT, NE STRING
     }
 ```
-
-![alt text](images/virt1.png)
+NAPOMENA: Bitno je da mtu bude iznad 1458 zato što jedino tako se interface može povezati na pod networking, tj. ako je manji od 1458 nećemo moći schedulati podove na njemu jer će ovnkube-controller pod izbacivati MTU error. Također, nakon što smo mu zadali MTU nakon instalacije bi trebalo biti omogućeno promijeniti mtu na br-ex interfaceu: `$ ip link set br-ex mtu 1500` ako to već nije automatski bilo napravljeno. Naime, u Linux Bridgingu je default mtu 1500, ali u OVN secondary networku kojeg mi koristimo je 1400, zbog toga ovo treba biti promijenjeno.
 
 Jako je bitno da se odabere opcija `OVN Kubernetes secondary localnet network`, a ne `Bridging` jer mi ovdje ne stvaramo bridging interface, on već postoji, mi ga samo reusamo, ovo je interface koji se spaja na LOKALNU MREŽU koja postoji na bridgeu, to je workaround za nodeove s jednom mrežnom karticom. Da smo npr imali dvije mrežne kartice, na drugoj bi stvorili bridge i direktno bi se spojili na taj interface.
 
@@ -120,3 +120,87 @@ network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Netwo
 File u pitanju je /etc/kubernetes/cni/net.d/00-multus.conf. Workaround je da odemo u već postojeći node te kopiramo taj file i prenesemo ga na novi node u isti path pod istim imenom te restartamo kubelet s `$ systemctl restart kubelet` i onda će node biti `Ready`. 
 
 ## Konfiguracija remote paljenja i gašenja
+Dalje samo pratimo dokumentaciju [prijašnjeg zadatka](./RemotePowerOn.md) sa malim izmjenama.
+
+Ideja: umjesto Wake On Lan protokola koji ne radi na virtualci možemo samo koristiti `virtctl` komandu. Zbog ovoga će zadatak biti i lakši.
+
+Jedina razlika od navedene dokumentacije je druga komanda koja će se vrtiti u KEDA instanci, a to će biti `$ virtctl start/stop <ime_vm>` ("dis" je ime virtualke).
+Radi jednostavnosti možemo izbjeći kreiranje nove Docker slike koja ima oc i virtctl komande već možemo direktno upravljati virtualkom preko oc komande s `$ oc patch`.
+
+```
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: cordon
+  namespace: keda-test # Bitno radi service accounta
+#  annotations:
+#    autoscaling.keda.sh/paused: "true"
+spec:
+  jobTargetRef:
+    template:
+      spec:
+        serviceAccountName: node-admin
+        hostNetwork: true
+        containers:
+          - name: suspend-drain
+            image: alpine:openshift
+            securityContext:
+              privileged: true
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              oc patch virtualmachine.kubevirt.io/dis -n openshift-storage --type merge -p '{"spec":{"runStrategy":"Halted"}}'
+              oc drain worker2 --ignore-daemonsets --delete-emptydir-data --force
+        restartPolicy: Never
+  pollingInterval: 30
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  maxReplicaCount: 1
+  triggers:
+  - type: cron
+    metadata:
+      start: "0 17 * * *"
+      end: "1 17 * * *"
+      timezone: "Europe/Zagreb"
+      pollingInterval: "30"
+      desiredReplicas: "1"
+```
+```
+apiVersion: keda.sh/v1alpha1
+kind: ScaledJob
+metadata:
+  name: uncordon
+  namespace: keda-test # Bitno radi service accounta
+#  annotations:
+#    autoscaling.keda.sh/paused: "true"
+spec:
+  jobTargetRef:
+    template:
+      spec:
+        serviceAccountName: node-admin
+        hostNetwork: true
+        containers:
+          - name: wake-uncordon
+            image: alpine:openshift
+            securityContext:
+              privileged: true
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              oc patch virtualmachine.kubevirt.io/dis -n openshift-storage --type merge -p '{"spec":{"runStrategy":"Always"}}'
+              oc uncordon worker2
+        restartPolicy: Never
+  pollingInterval: 30
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  maxReplicaCount: 1
+  triggers:
+  - type: cron
+    metadata:
+      start: "0 9 * * *"
+      end: "1 9 * * *"
+      timezone: "Europe/Zagreb"
+      pollingInterval: "30"
+      desiredReplicas: "1"
+```
+Također, ovo je isto moglo biti napravljeno s CronJobom ali je korištena KEDA radi vježbe. Dakle, jedina je bitna promjena u toj navedenoj komandi, sve ostalo je slično kao u dokumentaciji iz prijašnjeg zadatka.

@@ -167,7 +167,7 @@ spec:
         serviceAccountName: node-admin
         hostNetwork: true
         containers:
-          - name: wake-uncordon
+          - name: suspend-drain
             image: lvolarevic/kubewithwol:latest
             securityContext:
               privileged: true
@@ -244,7 +244,7 @@ spec:
         serviceAccountName: node-admin
         hostNetwork: true
         containers:
-          - name: wake-uncordon
+          - name: suspend-drain
             image: lvolarevic/kubewithwol:latest
             securityContext:
               privileged: true
