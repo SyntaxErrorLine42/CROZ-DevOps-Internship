@@ -123,6 +123,61 @@ Sačekamo instalaciju te pratimo sve ostale korake kao i u prvoj metodi samo bez
 
 ### Treća metoda
 
+Treća metoda koristi agent based instalaciju ([link](https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/nodes/working-with-nodes#adding-node-iso-yaml_adding-node-iso)). Prvo generiramo image:
+
+```
+oc adm node-image create nodes-config.yaml --registry-config=<putanja_do>/pull-secret
+```
+
+Za to nam je potrebna konfiguracijska datoteka *nodes-config.yaml*:
+
+```
+hosts:
+- hostname: worker2
+  interfaces:
+  - name: enp2s0
+    macAddress: 02:ba:0d:00:00:06
+  networkConfig:
+    interfaces:
+    - name: enp2s0
+      type: ethernet
+      state: up
+      mac-address: 02:ba:0d:00:00:06
+      ipv4:
+        enabled: true
+        address:
+        - ip: 10.0.16.109
+          prefix-length: 23
+        dhcp: false
+    dns-resolver:
+      config:
+        server:
+        - 10.0.10.2
+        - 10.0.10.3
+```
+
+Ovo je dosta slično agent-based instalaciji clustera koju smo radili na početku jer se u konfiguraciji traži MAC adresa na koju se statički mapira IP adresa. 
+Sučelje *enp2s0* predstavlja bridge koji smo napravili na početku, a kroz konzolu ćemo ga naknadno dodati.
+
+Zatim generirani image (*node.x86_64.iso*) spremamo kao volume kroz konzolu:
+
+![Add volume](./images/add_volume.png)
+
+Jako je bitno odabrati StorageClass koji podržava *ReadWriteMany*, i da se odabere odgovarajući InstanceType. U ovom primjeru korišten je *u1.xlarge*.
+
+Nakon toga nastavljamo sa kreiranjem VMa kroz sučelje, dajemo mu ime, provjerimo je li StorageClass ispravan i koristi li se ispravan InstanceType. Nakon toga idemo na *Customize VirtualMachine* i u *Details* namjestimo boot order da bude *1. root-disk -> 2. cdrom*. Zatim idemo u *Storage* i provjerimo da je rootdisk bootable i da ima dovoljnu veličinu (preko 120 Gi). Onda idemo u Network i dodamo *br-ex-network* interface koji smo napravili ranije i dodijelimo mu statičku MAC adresu koju smo postavili u nodes-config.yaml. Konačno, u *Scheduling* postavimo node selector da pokazuje na onaj node na kojem smo postavili bridge.
+
+Sada možemo kreirati i pokrenuti VM. Na računalu na kojem smo radili *oc adm image-create* pokrećemo:
+
+```
+oc adm node-image monitor --ip-addresses <ip_novog_cvora> -v=4
+```
+
+i pratimo napredak instalacije. Kada cijeli proces završi, potrebno je odobriti CSR-ove sa:
+
+```
+oc adm certificate approve <cert_name>
+```
 
 
 ## Konfiguracija remote paljenja i gašenja
