@@ -15,3 +15,4 @@
 13. [Remote paljenje i gašenje nodea u Baremetal clusteru](./RemotePowerOn.md)
 14. [Portworx Backup](./PortworxBackup.md)
 15. [Dodavanje Virtualke kao node u Cluster i automatizacija](./AddVMtoCluster.md)
+16. [Lightspeed operator](./Lightspeed.md)
