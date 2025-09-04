@@ -91,7 +91,7 @@ i restartamo deployment:
     $ oc -n argo-events rollout restart deployment controller-manager
 
 Onda kreiramo jednostavni event bus u fileu bus-event.yaml i applyamo ga:
-
+```
   apiVersion: argoproj.io/v1alpha1
   kind: EventBus
   metadata:
@@ -101,7 +101,7 @@ Onda kreiramo jednostavni event bus u fileu bus-event.yaml i applyamo ga:
     nats:
       native:
         replicas: 1
-
+```
 
     $ oc apply -f bus-event.yaml
 
