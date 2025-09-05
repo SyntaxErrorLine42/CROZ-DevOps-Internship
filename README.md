@@ -16,3 +16,4 @@
 14. [Portworx Backup](./PortworxBackup.md)
 15. [Dodavanje Virtualke kao node u Cluster i automatizacija](./AddVMtoCluster.md)
 16. [Lightspeed operator](./Lightspeed.md)
+17. [Završna prezentacija](./CROZ-Prezentacija.pptx)
